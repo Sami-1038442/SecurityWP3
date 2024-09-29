@@ -10,7 +10,7 @@ from flask_session import Session
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///action_types.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_key')  # Default value for development
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
 
@@ -220,4 +220,4 @@ def calculate_action_type(student):
 
 if __name__ == '__main__':
     create_database()
-    app.run(debug=True)
+    app.run(debug=os.environ.get('FLASK_DEBUG', 'False') == 'True')
