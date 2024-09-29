@@ -220,4 +220,4 @@ def calculate_action_type(student):
 
 if __name__ == '__main__':
     create_database()
-    app.run(debug=True)
+    app.run(debug=False)
