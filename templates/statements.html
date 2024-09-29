@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Action Types App - Stellingen</title>
+</head>
+<body>
+    <h1>Stellingen</h1>
+    <div id="statement-container">
+        <p id="statement-text"></p>
+        <button id="choice-1" onclick="submitChoice(1)">Keuze 1</button>
+        <button id="choice-2" onclick="submitChoice(2)">Keuze 2</button>
+    </div>
+    <div id="message"></div>
+    <script>
+        const studentNumber = "{{ student_number }}";
+
+        function loadNextStatement() {
+            fetch(`/api/student/${studentNumber}/statement`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('message').innerText = data.error;
+                        document.getElementById('statement-container').style.display = 'none';
+                    } else {
+                        document.getElementById('statement-text').innerText = data.statement_choices[0].choice_text;
+                        document.getElementById('choice-1').innerText = data.statement_choices[0].choice_text;
+                        document.getElementById('choice-2').innerText = data.statement_choices[1].choice_text;
+                        document.getElementById('statement-container').dataset.statementNumber = data.statement_number;
+                    }
+                });
+        }
+
+        function submitChoice(choice) {
+            const statementNumber = document.getElementById('statement-container').dataset.statementNumber;
+            fetch(`/api/student/${studentNumber}/statement/${statementNumber}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ statement_choice: choice })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    if (data.action_type) {
+                        document.getElementById('message').innerText = `Bedankt! Je action type is: ${data.action_type}`;
+                        document.getElementById('statement-container').style.display = 'none';
+                    } else {
+                        loadNextStatement();
+                    }
+                } else {
+                    document.getElementById('message').innerText = 'Er is een fout opgetreden bij het opslaan van het antwoord.';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadNextStatement);
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Action Types App - Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="login-form">
+        <label for="student-number">Studentnummer:</label>
+        <input type="text" id="student-number" name="student-number" required>
+        <button type="submit">Login</button>
+    </form>
+    <div id="message"></div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const studentNumber = document.getElementById('student-number').value;
+            fetch(`/api/student/${studentNumber}/statement`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('message').innerText = data.error;
+                    } else {
+                        window.location.href = `/statements?student_number=${studentNumber}`;
+                    }
+                });
+        });
+    </script>
+</body>
+</html>

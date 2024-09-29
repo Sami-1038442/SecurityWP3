@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Action Types App - Beheer</title>
+</head>
+<body>
+    <h1>Beheer</h1>
+    <form id="add-student-form">
+        <label for="student-number">Studentnummer:</label>
+        <input type="text" id="student-number" name="student-number" required>
+        <label for="student-name">Naam:</label>
+        <input type="text" id="student-name" name="student-name" required>
+        <label for="class-name">Klas:</label>
+        <input type="text" id="class-name" name="class-name" required>
+        <button type="submit">Toevoegen</button>
+    </form>
+    <div id="message"></div>
+    <h2>Studenten</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Studentnummer</th>
+                <th>Naam</th>
+                <th>Klas</th>
+                <th>Action Type</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.student_number }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.class_name }}</td>
+                <td>{{ student.action_type }}</td>
+                <td>
+                    <button onclick="deleteStudent({{ student.student_number }})">Verwijderen</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_admin %}
+    <h2>Docenten</h2>
+    <form id="add-teacher-form">
+        <label for="teacher-username">Gebruikersnaam:</label>
+        <input type="text" id="teacher-username" name="teacher-username" required>
+        <label for="teacher-password">Wachtwoord:</label>
+        <input type="password" id="teacher-password" name="teacher-password" required>
+        <label for="teacher-is-admin">Admin:</label>
+        <input type="checkbox" id="teacher-is-admin" name="teacher-is-admin">
+        <button type="submit">Toevoegen</button>
+    </form>
+    <div id="teacher-message"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Gebruikersnaam</th>
+                <th>Admin</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in teachers %}
+            <tr>
+                <td>{{ teacher.username }}</td>
+                <td>{{ teacher.is_admin }}</td>
+                <td>
+                    <button onclick="deleteTeacher({{ teacher.id }})">Verwijderen</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <script>
+        document.getElementById('add-student-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const studentNumber = document.getElementById('student-number').value;
+            const studentName = document.getElementById('student-name').value;
+            const className = document.getElementById('class-name').value;
+
+            if (!/^\d+$/.test(studentNumber)) {
+                document.getElementById('message').innerText = 'Studentnummer mag alleen cijfers bevatten';
+                return;
+            }
+                        
+            fetch('/api/admin/add_student', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    student_number: studentNumber,
+                    name: studentName,
+                    class_name: className
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    document.getElementById('message').innerText = 'Student toegevoegd.';
+                    location.reload();
+                } else {
+                    document.getElementById('message').innerText = 'Er is een fout opgetreden.';
+                }
+            });
+        });
+
+        function deleteStudent(studentNumber) {
+            fetch(`/api/admin/delete_student/${studentNumber}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    location.reload();
+                } else {
+                    document.getElementById('message').innerText = 'Er is een fout opgetreden.';
+                }
+            });
+        }
+
+        {% if is_admin %}
+        document.getElementById('add-teacher-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('teacher-username').value;
+            const password = document.getElementById('teacher-password').value;
+            const isAdmin = document.getElementById('teacher-is-admin').checked;
+
+            fetch('/api/admin/add_teacher', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    is_admin: isAdmin
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    document.getElementById('teacher-message').innerText = 'Docent toegevoegd.';
+                    location.reload();
+                } else {
+                    document.getElementById('teacher-message').innerText = 'Er is een fout opgetreden.';
+                }
+            });
+        });
+
+        function deleteTeacher(teacherId) {
+            fetch(`/api/admin/delete_teacher/${teacherId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    location.reload();
+                } else {
+                    document.getElementById('teacher-message').innerText = 'Er is een fout opgetreden.';
+                }
+            });
+        }
+        {% endif %}
+    </script>
+</body>
+</html>
