@@ -13,7 +13,8 @@ def import_students():
             new_student = Student(
                 student_number=student['student_number'],
                 name=student['student_name'],
-                class_name=student['student_class']
+                class_name=student['student_class'],
+                team=None
             )
             db.session.add(new_student)
         db.session.commit()

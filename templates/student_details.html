@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Details</title>
+</head>
+<body>
+    <h1>Student Details</h1>
+
+    <p><strong>Studentnummer:</strong> {{ student.student_number }}</p>
+    <p><strong>Naam:</strong> {{ student.name }}</p>
+    <p><strong>Klas:</strong> {{ student.class_name }}</p>
+    <p><strong>Team:</strong> {{ student.team }}</p>
+    <p><strong>Action Type:</strong> {{ student.action_type }}</p>
+
+    <button onclick="deleteStudent({{ student.student_number }})">Verwijderen</button>
+
+    <script>
+        function deleteStudent(studentNumber) {
+            fetch(`/api/admin/delete_student/${studentNumber}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    alert('Student verwijderd');
+                    window.location.href = '/admin';
+                } else {
+                    alert('Er is een fout opgetreden bij het verwijderen.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
