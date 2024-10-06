@@ -42,13 +42,13 @@ def import_statements():
 def create_teachers():
     teacher1 = Teacher(
         username='teacher1',
-        password=generate_password_hash('password1', method='pbkdf2:sha256'),
+        password=generate_password_hash('password1', method='pbkdf2:sha256', salt_length=16, iterations=100000),
         is_admin=True
     )
     
     teacher2 = Teacher(
         username='teacher2',
-        password=generate_password_hash('password2', method='pbkdf2:sha256'),
+        password=generate_password_hash('password2', method='pbkdf2:sha256', salt_length=16, iterations=100000),
         is_admin=False
     )
     
