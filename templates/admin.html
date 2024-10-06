@@ -16,14 +16,14 @@
         <button type="submit">Toevoegen</button>
     </form>
     <div id="message"></div>
+
     <h2>Studenten</h2>
     <table>
         <thead>
             <tr>
                 <th>Studentnummer</th>
-                <th>Naam</th>
                 <th>Klas</th>
-                <th>Action Type</th>
+                <th>Team</th>
                 <th>Acties</th>
             </tr>
         </thead>
@@ -31,11 +31,10 @@
             {% for student in students %}
             <tr>
                 <td>{{ student.student_number }}</td>
-                <td>{{ student.name }}</td>
                 <td>{{ student.class_name }}</td>
-                <td>{{ student.action_type }}</td>
+                <td>{{ student.team }}</td>
                 <td>
-                    <button onclick="deleteStudent({{ student.student_number }})">Verwijderen</button>
+                    <a href="{{ url_for('student_details', student_number=student.student_number) }}">Details bekijken</a>
                 </td>
             </tr>
             {% endfor %}
@@ -87,7 +86,7 @@
                 document.getElementById('message').innerText = 'Studentnummer mag alleen cijfers bevatten';
                 return;
             }
-                        
+
             fetch('/api/admin/add_student', {
                 method: 'POST',
                 headers: {
@@ -109,20 +108,6 @@
                 }
             });
         });
-
-        function deleteStudent(studentNumber) {
-            fetch(`/api/admin/delete_student/${studentNumber}`, {
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === 'ok') {
-                    location.reload();
-                } else {
-                    document.getElementById('message').innerText = 'Er is een fout opgetreden.';
-                }
-            });
-        }
 
         {% if is_admin %}
         document.getElementById('add-teacher-form').addEventListener('submit', function(event) {

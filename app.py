@@ -50,10 +50,23 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/admin')
+@app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
-    students = Student.query.all()
+    if request.method == 'POST':
+        class_name = request.form.get('class_name')
+        team_name = request.form.get('team_name')
+
+        query = Student.query
+        if class_name:
+            query = query.filter_by(class_name=class_name)
+        if team_name:
+            query = query.filter_by(team=team_name)
+
+        students = query.all()
+    else:
+        students = Student.query.all()
+
     teachers = Teacher.query.all()
     return render_template('admin.html', students=students, teachers=teachers, is_admin=current_user.is_admin)
 
@@ -87,17 +100,55 @@ def delete_student(student_number):
 
     return jsonify({"result": "ok"})
 
-@app.route('/api/admin/student/<student_number>/action_type', methods=['GET'])
+@app.route('/student_details/<student_number>', methods=['GET'])
 @login_required
-def get_student_action_type(student_number):
+def student_details(student_number):
+    student = Student.query.filter_by(student_number=student_number).first()
+    if not student:
+        flash("Student niet gevonden.", "error")
+        return redirect(url_for('admin'))
+    
+    return render_template('student_details.html', student=student)
+
+@app.route('/api/admin/student/<student_number>', methods=['GET'])
+@login_required
+def get_student_details(student_number):
     student = Student.query.filter_by(student_number=student_number).first()
     if not student:
         return jsonify({"error": "Dit studentnummer is niet geregistreerd"}), 404
 
-    if not student.action_type:
-        return jsonify({"error": "Action type not calculated"}), 404
+    response = {
+        "student_number": student.student_number,
+        "name": student.name,
+        "class_name": student.class_name,
+        "team": student.team,
+        "added_by": current_user.username,
+        "answers": [
+            {
+                "statement_number": answer.statement_id,
+                "choice": answer.choice
+            } for answer in student.answers
+        ]
+    }
 
-    return jsonify({"action_type": student.action_type})
+    return jsonify(response)
+
+@app.route('/api/admin/student/<student_number>/edit', methods=['POST'])
+@login_required
+def edit_student(student_number):
+    data = request.get_json()
+    student = Student.query.filter_by(student_number=student_number).first()
+
+    if not student:
+        return jsonify({"error": "Student niet gevonden"}), 404
+
+    student.name = data.get('name', student.name)
+    student.class_name = data.get('class_name', student.class_name)
+    student.team = data.get('team', student.team)
+
+    db.session.commit()
+
+    return jsonify({"result": "ok"})
 
 @app.route('/api/admin/add_teacher', methods=['POST'])
 @login_required
@@ -136,7 +187,6 @@ def delete_teacher(teacher_id):
 def statements():
     student_number = request.args.get('student_number')
     return render_template('statements.html', student_number=student_number)
-
 
 @app.route('/api/student/<student_number>/statement', methods=['GET'])
 def get_statement(student_number):
@@ -220,4 +270,4 @@ def calculate_action_type(student):
 
 if __name__ == '__main__':
     create_database()
-    app.run(debug=False)
+    app.run(debug=True)

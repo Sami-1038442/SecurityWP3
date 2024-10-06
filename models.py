@@ -9,6 +9,7 @@ class Student(db.Model):
     name = db.Column(db.String(100), nullable=False)
     class_name = db.Column(db.String(50), nullable=False)
     action_type = db.Column(db.String(4), nullable=True)
+    team = db.Column(db.String, nullable=True)
     answers = db.relationship('Answer', backref='student', lazy=True, cascade="all, delete-orphan")
 
 class Statement(db.Model):
