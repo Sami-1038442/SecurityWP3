@@ -112,7 +112,7 @@ def add_teacher():
     if not username or not password:
         return jsonify({"error": "Missing data"}), 400
 
-    new_teacher = Teacher(username=username, password=generate_password_hash(password, method='pbkdf2:sha256'), is_admin=is_admin)
+    new_teacher = Teacher(username=username, password=generate_password_hash(password, method='pbkdf2:sha256', salt_length=16, iterations=100000), is_admin=is_admin)
     db.session.add(new_teacher)
     db.session.commit()
 
