@@ -107,8 +107,13 @@ def student_details(student_number):
     if not student:
         flash("Student niet gevonden.", "error")
         return redirect(url_for('admin'))
-    
-    return render_template('student_details.html', student=student)
+    answers = Answer.query.filter_by(student_id=student.id).all()
+    chosen_statements = []
+    for answer in answers:
+        choice = StatementChoice.query.get(answer.choice)
+        if choice:
+            chosen_statements.append(choice.choice_text)
+    return render_template('student_details.html', student=student, chosen_statements=chosen_statements)
 
 @app.route('/api/admin/student/<student_number>', methods=['GET'])
 @login_required

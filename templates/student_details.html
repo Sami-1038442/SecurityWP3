@@ -17,7 +17,18 @@
     <p><strong>Action Type:</strong> {{ student.action_type }}</p>
 
     <button onclick="deleteStudent({{ student.student_number }})">Verwijderen</button>
-
+    <div class="chosen-statements">
+        <h2>Chosen Statements</h2>
+        {% if chosen_statements %}
+            <ul>
+                {% for statement in chosen_statements %}
+                    <li>{{ statement }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No statements have been chosen.</p>
+        {% endif %}
+    </div>
     <div id="update-message"></div>
 
     <script>
