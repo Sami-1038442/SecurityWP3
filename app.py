@@ -103,14 +103,10 @@ def delete_student(student_number):
 @app.route('/student_details/<student_number>', methods=['GET'])
 @login_required
 def student_details(student_number):
-    # Fetch the student from the database using the student number
     student = Student.query.filter_by(student_number=student_number).first()
-    
     if not student:
         flash("Student niet gevonden.", "error")
         return redirect(url_for('admin'))
-
-    # Get the list of statement choices selected by the student along with the time they were chosen
     answers = Answer.query.filter_by(student_id=student.id).all()
     chosen_statements = []
     for answer in answers:
@@ -120,8 +116,6 @@ def student_details(student_number):
                 'choice_text': choice.choice_text,
                 'timestamp': answer.timestamp
             })
-
-    # Render the template with the student details and the list of chosen statements
     return render_template('student_details.html', student=student, chosen_statements=chosen_statements)
 
 @app.route('/api/admin/student/<student_number>', methods=['GET'])
@@ -159,6 +153,7 @@ def edit_student(student_number):
     student.name = data.get('name', student.name)
     student.class_name = data.get('class_name', student.class_name)
     student.team = data.get('team', student.team)
+    student.team_updated_by = current_user.username
 
     db.session.commit()
 

@@ -14,7 +14,8 @@ def import_students():
                 student_number=student['student_number'],
                 name=student['student_name'],
                 class_name=student['student_class'],
-                team=None
+                team=None, 
+                team_updated_by=None  
             )
             db.session.add(new_student)
         db.session.commit()
@@ -27,16 +28,20 @@ def import_statements():
                 statement_number=statement['statement_number']
             )
             db.session.add(new_statement)
-            db.session.commit() 
 
+        db.session.commit()
+
+        for statement in statements:
+            statement_obj = Statement.query.filter_by(statement_number=statement['statement_number']).first()
             for choice in statement['statement_choices']:
                 new_choice = StatementChoice(
-                    statement_id=new_statement.id,
+                    statement_id=statement_obj.id,
                     choice_number=choice['choice_number'],
                     choice_text=choice['choice_text'],
                     choice_result=choice['choice_result']
                 )
                 db.session.add(new_choice)
+
         db.session.commit()
 
 def create_teachers():
@@ -62,4 +67,4 @@ if __name__ == '__main__':
         db.create_all()
         import_students()
         import_statements()
-        create_teachers()
+        create_teachers() 

@@ -10,6 +10,7 @@ class Student(db.Model):
     class_name = db.Column(db.String(50), nullable=False)
     action_type = db.Column(db.String(4), nullable=True)
     team = db.Column(db.String, nullable=True)
+    team_updated_by = db.Column(db.String(150), nullable=True)
     answers = db.relationship('Answer', backref='student', lazy=True, cascade="all, delete-orphan")
 
 class Statement(db.Model):

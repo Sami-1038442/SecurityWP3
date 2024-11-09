@@ -14,6 +14,10 @@
         <input type="text" id="team" name="team" value="{{ student.team }}">
         <button id="update-team-button">Update Team</button>
     </p>
+    {% if student.team_updated_by %}
+        <p><strong>Team gezet door (admin):</strong> {{ student.team_updated_by }}</p>
+    {% endif %}
+
     <p><strong>Action Type:</strong> {{ student.action_type }}</p>
 
     <button onclick="deleteStudent({{ student.student_number }})">Verwijderen</button>
@@ -57,6 +61,7 @@
                 }
             });
         });
+
         function deleteStudent(studentNumber) {
             fetch(`/api/admin/delete_student/${studentNumber}`, {
                 method: 'DELETE'
