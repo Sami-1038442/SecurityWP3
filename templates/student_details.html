@@ -10,12 +10,37 @@
     <p><strong>Studentnummer:</strong> {{ student.student_number }}</p>
     <p><strong>Naam:</strong> {{ student.name }}</p>
     <p><strong>Klas:</strong> {{ student.class_name }}</p>
-    <p><strong>Team:</strong> {{ student.team }}</p>
+    <p><strong>Team:</strong> 
+        <input type="text" id="team" name="team" value="{{ student.team }}">
+        <button id="update-team-button">Update Team</button>
+    </p>
     <p><strong>Action Type:</strong> {{ student.action_type }}</p>
 
     <button onclick="deleteStudent({{ student.student_number }})">Verwijderen</button>
 
+    <div id="update-message"></div>
+
     <script>
+        document.getElementById('update-team-button').addEventListener('click', function(event) {
+            event.preventDefault();
+            const team = document.getElementById('team').value;
+
+            fetch(`/api/admin/student/{{ student.student_number }}/edit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ team: team })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    document.getElementById('update-message').innerText = 'Team updated successfully.';
+                } else {
+                    document.getElementById('update-message').innerText = 'Failed to update team.';
+                }
+            });
+        });
         function deleteStudent(studentNumber) {
             fetch(`/api/admin/delete_student/${studentNumber}`, {
                 method: 'DELETE'
