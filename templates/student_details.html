@@ -22,7 +22,12 @@
         {% if chosen_statements %}
             <ul>
                 {% for statement in chosen_statements %}
-                    <li>{{ statement }}</li>
+                    <li>
+                        {{ statement.choice_text }}
+                        <span class="timestamp">
+                            (Chosen on: {{ statement.timestamp.strftime('%Y-%m-%d %H:%M:%S') }})
+                        </span>
+                    </li>
                 {% endfor %}
             </ul>
         {% else %}
