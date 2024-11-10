@@ -183,6 +183,8 @@ def add_teacher():
 def delete_teacher(teacher_id):
     if not current_user.is_admin:
         return jsonify({"error": "Unauthorized"}), 403
+    if str(current_user.id) == teacher_id:
+        return jsonify({"error": "You cannot delete your own account"}), 403
     teacher = Teacher.query.get(teacher_id)
     if not teacher:
         return jsonify({"error": "Teacher not found"}), 404
@@ -191,6 +193,7 @@ def delete_teacher(teacher_id):
     db.session.commit()
 
     return jsonify({"result": "ok"})
+
 
 @app.route('/statements')
 def statements():

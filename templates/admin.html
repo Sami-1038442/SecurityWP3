@@ -3,78 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <title>Action Types App - Beheer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Beheer</h1>
-    <form id="add-student-form">
-        <label for="student-number">Studentnummer:</label>
-        <input type="text" id="student-number" name="student-number" required>
-        <label for="student-name">Naam:</label>
-        <input type="text" id="student-name" name="student-name" required>
-        <label for="class-name">Klas:</label>
-        <input type="text" id="class-name" name="class-name" required>
-        <button type="submit">Toevoegen</button>
-    </form>
-    <div id="message"></div>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
 
-    <h2>Studenten</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Studentnummer</th>
-                <th>Klas</th>
-                <th>Team</th>
-                <th>Acties</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in students %}
-            <tr>
-                <td>{{ student.student_number }}</td>
-                <td>{{ student.class_name }}</td>
-                <td>{{ student.team }}</td>
-                <td>
-                    <a href="{{ url_for('student_details', student_number=student.student_number) }}">Details bekijken</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Top-right Logout button -->
+    <div class="absolute top-4 right-4">
+        <a href="/logout" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600">Logout</a>
+    </div>
 
-    {% if is_admin %}
-    <h2>Docenten</h2>
-    <form id="add-teacher-form">
-        <label for="teacher-username">Gebruikersnaam:</label>
-        <input type="text" id="teacher-username" name="teacher-username" required>
-        <label for="teacher-password">Wachtwoord:</label>
-        <input type="password" id="teacher-password" name="teacher-password" required>
-        <label for="teacher-is-admin">Admin:</label>
-        <input type="checkbox" id="teacher-is-admin" name="teacher-is-admin">
-        <button type="submit">Toevoegen</button>
-    </form>
-    <div id="teacher-message"></div>
-    <table>
-        <thead>
-            <tr>
-                <th>Gebruikersnaam</th>
-                <th>Admin</th>
-                <th>Acties</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for teacher in teachers %}
-            <tr>
-                <td>{{ teacher.username }}</td>
-                <td>{{ teacher.is_admin }}</td>
-                <td>
-                    <button onclick="deleteTeacher({{ teacher.id }})">Verwijderen</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    <!-- Admin Control Panel -->
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-3xl mx-auto">
+        
+        <!-- Form for adding students -->
+        <form id="add-student-form" class="mb-8">
+            <h2 class="text-lg font-medium text-gray-700 mb-4">Student Toevoegen</h2>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label for="student-number" class="block text-sm font-medium text-gray-700">Studentnummer:</label>
+                    <input type="text" id="student-number" name="student-number" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="student-name" class="block text-sm font-medium text-gray-700">Naam:</label>
+                    <input type="text" id="student-name" name="student-name" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="class-name" class="block text-sm font-medium text-gray-700">Klas:</label>
+                    <input type="text" id="class-name" name="class-name" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+            <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">Toevoegen</button>
+            <div id="message" class="mt-4 text-red-500"></div>
+        </form>
 
+        <!-- Students Table -->
+        <h2 class="text-lg font-medium text-gray-700 mb-4">Studenten</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border rounded-lg shadow-sm">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Studentnummer</th>
+                        <th class="py-3 px-6 text-left">Naam</th> <!-- New column for student name -->
+                        <th class="py-3 px-6 text-left">Klas</th>
+                        <th class="py-3 px-6 text-left">Team</th>
+                        <th class="py-3 px-6 text-left">Acties</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    {% for student in students %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6">{{ student.student_number }}</td>
+                        <td class="py-3 px-6">{{ student.name }}</td> <!-- Display student name -->
+                        <td class="py-3 px-6">{{ student.class_name }}</td>
+                        <td class="py-3 px-6">{{ student.team }}</td>
+                        <td class="py-3 px-6">
+                            <a href="{{ url_for('student_details', student_number=student.student_number) }}" class="text-blue-500 hover:underline">Details bekijken</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_admin %}
+        <!-- Form for adding teachers -->
+        <form id="add-teacher-form" class="mt-8">
+            <h2 class="text-lg font-medium text-gray-700 mb-4">Docent Toevoegen</h2>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                    <label for="teacher-username" class="block text-sm font-medium text-gray-700">Gebruikersnaam:</label>
+                    <input type="text" id="teacher-username" name="teacher-username" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="teacher-password" class="block text-sm font-medium text-gray-700">Wachtwoord:</label>
+                    <input type="password" id="teacher-password" name="teacher-password" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="col-span-2">
+                    <label for="teacher-is-admin" class="inline-flex items-center text-sm font-medium text-gray-700">
+                        <input type="checkbox" id="teacher-is-admin" name="teacher-is-admin" class="mr-2">
+                        Admin
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">Toevoegen</button>
+            <div id="teacher-message" class="mt-4 text-red-500"></div>
+        </form>
+
+        <!-- Teachers Table -->
+        <h2 class="text-lg font-medium text-gray-700 mt-8 mb-4">Docenten</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border rounded-lg shadow-sm">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Gebruikersnaam</th>
+                        <th class="py-3 px-6 text-left">Admin</th>
+                        <th class="py-3 px-6 text-left">Acties</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    {% for teacher in teachers %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6">{{ teacher.username }}</td>
+                        <td class="py-3 px-6">{{ teacher.is_admin }}</td>
+                        <td class="py-3 px-6">
+                            <button onclick="deleteTeacher({{ teacher.id }})" class="text-red-500 hover:underline">Verwijderen</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript to handle form submissions and deletion -->
     <script>
         document.getElementById('add-student-form').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -100,12 +147,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.result === 'ok') {
-                    document.getElementById('message').innerText = 'Student toegevoegd.';
-                    location.reload();
-                } else {
-                    document.getElementById('message').innerText = 'Er is een fout opgetreden.';
-                }
+                document.getElementById('message').innerText = data.result === 'ok' ? 'Student toegevoegd.' : 'Er is een fout opgetreden.';
+                location.reload();
             });
         });
 
@@ -129,19 +172,13 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.result === 'ok') {
-                    document.getElementById('teacher-message').innerText = 'Docent toegevoegd.';
-                    location.reload();
-                } else {
-                    document.getElementById('teacher-message').innerText = 'Er is een fout opgetreden.';
-                }
+                document.getElementById('teacher-message').innerText = data.result === 'ok' ? 'Docent toegevoegd.' : 'Er is een fout opgetreden.';
+                location.reload();
             });
         });
 
         function deleteTeacher(teacherId) {
-            fetch(`/api/admin/delete_teacher/${teacherId}`, {
-                method: 'DELETE'
-            })
+            fetch(`/api/admin/delete_teacher/${teacherId}`, { method: 'DELETE' })
             .then(response => response.json())
             .then(data => {
                 if (data.result === 'ok') {
