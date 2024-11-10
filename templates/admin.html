@@ -7,15 +7,12 @@
 </head>
 <body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
 
-    <!-- Top-right Logout button -->
     <div class="absolute top-4 right-4">
         <a href="/logout" class="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600">Logout</a>
     </div>
 
-    <!-- Admin Control Panel -->
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-3xl mx-auto">
         
-        <!-- Form for adding students -->
         <form id="add-student-form" class="mb-8">
             <h2 class="text-lg font-medium text-gray-700 mb-4">Student Toevoegen</h2>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -39,14 +36,13 @@
             <div id="message" class="mt-4 text-red-500"></div>
         </form>
 
-        <!-- Students Table -->
         <h2 class="text-lg font-medium text-gray-700 mb-4">Studenten</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border rounded-lg shadow-sm">
                 <thead>
                     <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                         <th class="py-3 px-6 text-left">Studentnummer</th>
-                        <th class="py-3 px-6 text-left">Naam</th> <!-- New column for student name -->
+                        <th class="py-3 px-6 text-left">Naam</th>
                         <th class="py-3 px-6 text-left">Klas</th>
                         <th class="py-3 px-6 text-left">Team</th>
                         <th class="py-3 px-6 text-left">Acties</th>
@@ -56,7 +52,7 @@
                     {% for student in students %}
                     <tr class="border-b border-gray-200 hover:bg-gray-100">
                         <td class="py-3 px-6">{{ student.student_number }}</td>
-                        <td class="py-3 px-6">{{ student.name }}</td> <!-- Display student name -->
+                        <td class="py-3 px-6">{{ student.name }}</td>
                         <td class="py-3 px-6">{{ student.class_name }}</td>
                         <td class="py-3 px-6">{{ student.team }}</td>
                         <td class="py-3 px-6">
@@ -69,7 +65,6 @@
         </div>
 
         {% if is_admin %}
-        <!-- Form for adding teachers -->
         <form id="add-teacher-form" class="mt-8">
             <h2 class="text-lg font-medium text-gray-700 mb-4">Docent Toevoegen</h2>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -94,7 +89,6 @@
             <div id="teacher-message" class="mt-4 text-red-500"></div>
         </form>
 
-        <!-- Teachers Table -->
         <h2 class="text-lg font-medium text-gray-700 mt-8 mb-4">Docenten</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border rounded-lg shadow-sm">
@@ -121,7 +115,6 @@
         {% endif %}
     </div>
 
-    <!-- JavaScript to handle form submissions and deletion -->
     <script>
         document.getElementById('add-student-form').addEventListener('submit', function(event) {
             event.preventDefault();
