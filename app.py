@@ -53,22 +53,19 @@ def logout():
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin():
-    if request.method == 'POST':
-        class_name = request.form.get('class_name')
-        team_name = request.form.get('team_name')
+    class_name = request.args.get('class_name')
+    team_name = request.args.get('team_name')
 
-        query = Student.query
-        if class_name:
-            query = query.filter_by(class_name=class_name)
-        if team_name:
-            query = query.filter_by(team=team_name)
+    query = Student.query
+    if class_name:
+        query = query.filter_by(class_name=class_name)
+    if team_name:
+        query = query.filter_by(team=team_name)
 
-        students = query.all()
-    else:
-        students = Student.query.all()
-
+    students = query.all()
     teachers = Teacher.query.all()
     return render_template('admin.html', students=students, teachers=teachers, is_admin=current_user.is_admin)
+
 
 @app.route('/api/admin/add_student', methods=['POST'])
 @login_required
