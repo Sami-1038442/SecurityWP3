@@ -7,6 +7,7 @@ pip instal --r .\requirements.txt
 python import_data.py
 
 python app.py
+
 Beschrijving
 -----------------------------------------
 
