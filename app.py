@@ -191,6 +191,20 @@ def delete_teacher(teacher_id):
 
     return jsonify({"result": "ok"})
 
+@app.route('/api/admin/toggle_admin/<int:teacher_id>', methods=['POST'])
+@login_required
+def toggle_admin(teacher_id):
+    if not current_user.is_admin:
+        return jsonify({"result": "error", "message": "Unauthorized"}), 403
+    
+    teacher = Teacher.query.get(teacher_id)
+    if not teacher:
+        return jsonify({"result": "error", "message": "Teacher not found"}), 404
+    
+    teacher.is_admin = not teacher.is_admin
+    db.session.commit()
+
+    return jsonify({"result": "ok"})
 
 @app.route('/statements')
 def statements():

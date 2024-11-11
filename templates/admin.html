@@ -78,8 +78,39 @@
                 </tbody>
             </table>
         </div>
-
         {% if is_admin %}
+        <h2 class="text-lg font-medium text-gray-700 mt-8 mb-4">Docenten</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border rounded-lg shadow-sm">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Gebruikersnaam</th>
+                        <th class="py-3 px-6 text-left">Admin</th>
+                        <th class="py-3 px-6 text-left">Acties</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    {% for teacher in teachers %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6">{{ teacher.username }}</td>
+                        <td class="py-3 px-6">{{ "Ja" if teacher.is_admin else "Nee" }}</td>
+                        <td class="py-3 px-6">
+                            {% if not teacher.is_admin %}
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" onclick="toggleAdmin({{ teacher.id }})" class="mr-2">
+                                Maak admin
+                            </label>
+                            <button onclick="deleteTeacher({{ teacher.id }})" class="text-red-500 hover:underline ml-4">Verwijderen</button>
+                            {% else %}
+                            <span class="text-gray-500">Admin</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
         <form id="add-teacher-form" class="mt-8">
             <h2 class="text-lg font-medium text-gray-700 mb-4">Docent Toevoegen</h2>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -103,31 +134,8 @@
             <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600">Toevoegen</button>
             <div id="teacher-message" class="mt-4 text-red-500"></div>
         </form>
-
-        <h2 class="text-lg font-medium text-gray-700 mt-8 mb-4">Docenten</h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white border rounded-lg shadow-sm">
-                <thead>
-                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                        <th class="py-3 px-6 text-left">Gebruikersnaam</th>
-                        <th class="py-3 px-6 text-left">Admin</th>
-                        <th class="py-3 px-6 text-left">Acties</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-700">
-                    {% for teacher in teachers %}
-                    <tr class="border-b border-gray-200 hover:bg-gray-100">
-                        <td class="py-3 px-6">{{ teacher.username }}</td>
-                        <td class="py-3 px-6">{{ teacher.is_admin }}</td>
-                        <td class="py-3 px-6">
-                            <button onclick="deleteTeacher({{ teacher.id }})" class="text-red-500 hover:underline">Verwijderen</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
         {% endif %}
+        
     </div>
 
     <script>
@@ -196,6 +204,23 @@
                 }
             });
         }
+        function toggleAdmin(teacherId) {
+            fetch(`/api/admin/toggle_admin/${teacherId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'ok') {
+                    location.reload();
+                } else {
+                    alert('Er is een fout opgetreden bij het promoten van de docent.');
+                }
+            });
+        }
+
         {% endif %}
         function filterStudents() {
             const className = document.getElementById('filter-class-name').value;
