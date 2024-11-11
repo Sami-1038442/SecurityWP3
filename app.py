@@ -21,13 +21,16 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return Teacher.query.get(int(user_id))
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -38,17 +41,19 @@ def login():
         if user is None or not check_password_hash(user.password, password):
             flash('Verkeerde gebruikersnaam of wachtwoord')
             return redirect(url_for('login'))
-        
+
         login_user(user)
         return redirect(url_for('admin'))
-    
+
     return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -78,11 +83,13 @@ def add_student():
     if not student_number or not name or not class_name:
         return jsonify({"error": "Missing data"}), 400
 
-    new_student = Student(student_number=student_number, name=name, class_name=class_name)
+    new_student = Student(student_number=student_number,
+                          name=name, class_name=class_name)
     db.session.add(new_student)
     db.session.commit()
 
     return jsonify({"result": "ok"})
+
 
 @app.route('/api/admin/delete_student/<student_number>', methods=['DELETE'])
 @login_required
@@ -96,6 +103,7 @@ def delete_student(student_number):
     db.session.commit()
 
     return jsonify({"result": "ok"})
+
 
 @app.route('/student_details/<student_number>', methods=['GET'])
 @login_required
@@ -114,6 +122,7 @@ def student_details(student_number):
                 'timestamp': answer.timestamp
             })
     return render_template('student_details.html', student=student, chosen_statements=chosen_statements)
+
 
 @app.route('/api/admin/student/<student_number>', methods=['GET'])
 @login_required
@@ -138,6 +147,7 @@ def get_student_details(student_number):
 
     return jsonify(response)
 
+
 @app.route('/api/admin/student/<student_number>/edit', methods=['POST'])
 @login_required
 def edit_student(student_number):
@@ -156,6 +166,7 @@ def edit_student(student_number):
 
     return jsonify({"result": "ok"})
 
+
 @app.route('/api/admin/add_teacher', methods=['POST'])
 @login_required
 def add_teacher():
@@ -169,11 +180,13 @@ def add_teacher():
     if not username or not password:
         return jsonify({"error": "Missing data"}), 400
 
-    new_teacher = Teacher(username=username, password=generate_password_hash(password, method='pbkdf2:sha256'), is_admin=is_admin)
+    new_teacher = Teacher(username=username, password=generate_password_hash(
+        password, method='pbkdf2:sha256'), is_admin=is_admin)
     db.session.add(new_teacher)
     db.session.commit()
 
     return jsonify({"result": "ok"})
+
 
 @app.route('/api/admin/delete_teacher/<teacher_id>', methods=['DELETE'])
 @login_required
@@ -191,25 +204,28 @@ def delete_teacher(teacher_id):
 
     return jsonify({"result": "ok"})
 
+
 @app.route('/api/admin/toggle_admin/<int:teacher_id>', methods=['POST'])
 @login_required
 def toggle_admin(teacher_id):
     if not current_user.is_admin:
         return jsonify({"result": "error", "message": "Unauthorized"}), 403
-    
+
     teacher = Teacher.query.get(teacher_id)
     if not teacher:
         return jsonify({"result": "error", "message": "Teacher not found"}), 404
-    
+
     teacher.is_admin = not teacher.is_admin
     db.session.commit()
 
     return jsonify({"result": "ok"})
 
+
 @app.route('/statements')
 def statements():
     student_number = request.args.get('student_number')
     return render_template('statements.html', student_number=student_number)
+
 
 @app.route('/api/student/<student_number>/statement', methods=['GET'])
 def get_statement(student_number):
@@ -218,7 +234,8 @@ def get_statement(student_number):
         return jsonify({"error": "Dit studentnummer is niet geregistreerd"}), 404
 
     answered_statements = [answer.statement_id for answer in student.answers]
-    next_statement = Statement.query.filter(~Statement.id.in_(answered_statements)).first()
+    next_statement = Statement.query.filter(
+        ~Statement.id.in_(answered_statements)).first()
 
     if not next_statement:
         action_type = calculate_action_type(student)
@@ -235,6 +252,7 @@ def get_statement(student_number):
     }
     return jsonify(response)
 
+
 @app.route('/api/student/<student_number>/statement/<statement_number>', methods=['POST'])
 def save_answer(student_number, statement_number):
     data = request.get_json()
@@ -244,15 +262,18 @@ def save_answer(student_number, statement_number):
     if not student:
         return jsonify({"error": "Dit studentnummer is niet geregistreerd"}), 404
 
-    statement = Statement.query.filter_by(statement_number=statement_number).first()
+    statement = Statement.query.filter_by(
+        statement_number=statement_number).first()
     if not statement:
         return jsonify({"error": "Statement not found"}), 404
 
-    choice = StatementChoice.query.filter_by(statement_id=statement.id, choice_number=choice_number).first()
+    choice = StatementChoice.query.filter_by(
+        statement_id=statement.id, choice_number=choice_number).first()
     if not choice:
         return jsonify({"error": "Choice not found"}), 404
 
-    answer = Answer(student_id=student.id, statement_id=statement.id, choice=choice_number)
+    answer = Answer(student_id=student.id,
+                    statement_id=statement.id, choice=choice_number)
     db.session.add(answer)
     db.session.commit()
 
@@ -266,20 +287,23 @@ def save_answer(student_number, statement_number):
 
     return jsonify({"result": "ok"})
 
+
 def create_database():
     with app.app_context():
         db.create_all()
 
+
 def calculate_action_type(student):
     characteristics = {
-        "E": 0, "I": 0, 
-        "S": 0, "N": 0, 
-        "T": 0, "F": 0,  
-        "J": 0, "P": 0   
+        "E": 0, "I": 0,
+        "S": 0, "N": 0,
+        "T": 0, "F": 0,
+        "J": 0, "P": 0
     }
 
     for answer in student.answers:
-        choice = StatementChoice.query.filter_by(statement_id=answer.statement_id, choice_number=answer.choice).first()
+        choice = StatementChoice.query.filter_by(
+            statement_id=answer.statement_id, choice_number=answer.choice).first()
         if choice.choice_result in characteristics:
             characteristics[choice.choice_result] += 1
 
@@ -290,6 +314,7 @@ def calculate_action_type(student):
     action_type += "P" if characteristics["P"] > characteristics["J"] else "J"
 
     return action_type
+
 
 if __name__ == '__main__':
     create_database()
