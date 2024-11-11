@@ -1,10 +1,12 @@
-# werkplaats-3-inhaalopdracht-actiontypes
-Template voor de WP3 inhaalopdracht "action types"
+WP3
 
-Deze repository bevat de volgende bestanden:
-- De opdrachtomschrijving: [CASUS.md](CASUS)
-- Een openapi specificatie voor het ontwerp van de API: [openapi.yaml](openapi.yaml)
-- Een lijst met action types: [actiontype_statements.json](actiontype_statements.json)
-- Een lijst met initiële studenten: [studenten.json](studenten.json)
+installatie
+-----------------------------------------
+pip instal --r .\requirements.txt
 
-Je mag dit document leegmaken en gebruiken voor documentatie van jouw uitwerking. 
+python import_data.py
+
+python app.py
+-----------------------------------------
+
+De webapplicatie is een applicatie waar studenten een action type test kunnen doen. Wanneer de student is geregsitreerd door een docent kan hij zijn studentnummer invullen en op start klikken om te kiezen tussen antwoorden in 20 stellingen. De resultaten kunnen worden bekeken op een dashboard als docent. Je kan daar de leerlingen in teams indelen en nieuwe leerlingen toevoegen. Ook kun je als docent de details van de student bekijken. Een admin kan ook nieuwe leraren toevoegen en beheren.
